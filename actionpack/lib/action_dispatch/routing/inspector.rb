@@ -178,24 +178,23 @@ module ActionDispatch
 
         private
           def draw_section(routes)
-            header_lengths = ["Prefix", "Verb", "URI Pattern"].map(&:length)
+            header_lengths = ["Prefix", "Verb"].map(&:length)
             name_width, verb_width, path_width = widths(routes).zip(header_lengths).map(&:max)
 
             routes.map do |r|
-              "#{r[:name].rjust(name_width)} #{r[:verb].ljust(verb_width)} #{r[:path].ljust(path_width)} #{r[:reqs]}"
+              "#{r[:name].rjust(name_width)} #{r[:verb].ljust(verb_width)} #{r[:reqs]}"
             end
           end
 
           def draw_header(routes)
             name_width, verb_width, path_width = widths(routes)
 
-            "#{"Prefix".rjust(name_width)} #{"Verb".ljust(verb_width)} #{"URI Pattern".ljust(path_width)} Controller#Action"
+            "#{"Prefix".rjust(name_width)} #{"Verb".ljust(verb_width)} Controller#Action"
           end
 
           def widths(routes)
             [routes.map { |r| r[:name].length }.max || 0,
-             routes.map { |r| r[:verb].length }.max || 0,
-             routes.map { |r| r[:path].length }.max || 0]
+             routes.map { |r| r[:verb].length }.max || 0]
           end
       end
 

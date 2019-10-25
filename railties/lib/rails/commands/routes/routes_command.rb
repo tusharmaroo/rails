@@ -8,6 +8,7 @@ module Rails
       class_option :controller, aliases: "-c", desc: "Filter by a specific controller, e.g. PostsController or Admin::PostsController."
       class_option :grep, aliases: "-g", desc: "Grep routes by a specific pattern."
       class_option :expanded, type: :boolean, aliases: "-E", desc: "Print routes expanded vertically with parts explained."
+      class_option :columns, aliases: "-f", desc: "Print routes with specific columns, e.g. name, verb, path & reqs"
 
       def perform(*)
         require_application_and_environment!
@@ -30,7 +31,7 @@ module Rails
         end
 
         def routes_filter
-          options.symbolize_keys.slice(:controller, :grep)
+          options.symbolize_keys.slice(:controller, :grep, :columns)
         end
     end
   end

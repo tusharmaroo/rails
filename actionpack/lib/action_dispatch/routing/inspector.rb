@@ -63,8 +63,8 @@ module ActionDispatch
 
       def format(formatter, filter = {})
         routes_to_display = filter_routes(normalize_filter(filter))
-        puts filter
-        columns_to_display = filter_columns(filter)
+        # puts filter
+        columns_to_display = filter_columns(filter) || nil
         routes = collect_routes(routes_to_display)
         if routes.none?
           formatter.no_routes(collect_routes(@routes), filter)
@@ -90,7 +90,7 @@ module ActionDispatch
             { controller: /#{filter[:grep]}/, action: /#{filter[:grep]}/,
               verb: /#{filter[:grep]}/, name: /#{filter[:grep]}/, path: /#{filter[:grep]}/ }
           elsif filter[:columns]
-            puts "We are doing some progress"
+            # puts "We are doing some progress"
           end
         end
 
@@ -178,16 +178,16 @@ module ActionDispatch
           @buffer << "\n#{title}:"
         end
 
-        def section(routes, columns_to_display)
+        def section(routes, columns_to_display = nil)
           @buffer << draw_section(routes, columns_to_display)
         end
 
-        def header(routes, columns_to_display)
+        def header(routes, columns_to_display = nil)
           @buffer << draw_header(routes, columns_to_display)
         end
 
         private
-          def draw_section(routes, columns_to_display)
+          def draw_section(routes, columns_to_display =  nil)
             header_lengths = ["Prefix", "Verb", "URI Pattern", "Controller#Action"].map(&:length)
             name_width, verb_width, path_width, reqs_width = widths(routes).zip(header_lengths).map(&:max)
 
@@ -196,13 +196,13 @@ module ActionDispatch
             end
           end
 
-          def draw_section_row(r, columns_to_display, name_width, verb_width, path_width, reqs_width)
+          def draw_section_row(r, columns_to_display = nil, name_width, verb_width, path_width, reqs_width)
             # if filter is not there everything should work normally
             row = ""
             row += "#{r[:name].rjust(name_width)} " unless (columns_to_display && !(columns_to_display.include? :name))
             row += "#{r[:verb].ljust(verb_width)} " unless (columns_to_display && !(columns_to_display.include? :verb))
             row += "#{r[:path].ljust(path_width)} " unless (columns_to_display && !(columns_to_display.include? :path))
-            row += "#{r[:reqs].ljust(reqs_width)} " unless (columns_to_display && !(columns_to_display.include? :reqs))
+            row += "#{r[:reqs]}" unless (columns_to_display && !(columns_to_display.include? :reqs))
             row
           end
 
@@ -217,12 +217,13 @@ module ActionDispatch
           end
 
           def draw_header(routes, columns_to_display)
-            name_width, verb_width, path_width, reqs_width = widths(routes)
+            header_lengths = ["Prefix", "Verb", "URI Pattern", "Controller#Action"].map(&:length)
+            name_width, verb_width, path_width, reqs_width = widths(routes).zip(header_lengths).map(&:max)
             header = ""
             header += "#{"Prefix".rjust(name_width)} " unless (columns_to_display && !(columns_to_display.include? :name))
             header += "#{"Verb".ljust(verb_width)} " unless (columns_to_display && !(columns_to_display.include? :verb))
             header += "#{"URI Pattern".ljust(path_width)} " unless (columns_to_display && !(columns_to_display.include? :path))
-            header += "#{"Controller#Action".ljust(reqs_width)} " unless (columns_to_display && !(columns_to_display.include? :reqs))
+            header += "#{"Controller#Action"}" unless (columns_to_display && !(columns_to_display.include? :reqs))
             header
           end
 
@@ -244,12 +245,12 @@ module ActionDispatch
           @buffer << "\n#{"[ #{title} ]"}"
         end
 
-        def section(routes)
-          @buffer << draw_expanded_section(routes)
+        def section(routes, columns_to_display = nil)
+          @buffer << draw_expanded_section(routes, columns_to_display)
         end
 
         private
-          def draw_expanded_section(routes)
+          def draw_expanded_section(routes, columns_to_display)
             routes.map.each_with_index do |r, i|
               <<~MESSAGE.chomp
                 #{route_header(index: i + 1)}
@@ -277,12 +278,12 @@ module ActionDispatch
         @buffer << %(<tr><th colspan="4">#{title}</th></tr>)
       end
 
-      def section(routes)
+      def section(routes, columns_to_display)
         @buffer << @view.render(partial: "routes/route", collection: routes)
       end
 
       # The header is part of the HTML page, so we don't construct it here.
-      def header(routes)
+      def header(routes, columns_to_display)
       end
 
       def no_routes(*)

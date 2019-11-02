@@ -63,7 +63,6 @@ module ActionDispatch
 
       def format(formatter, filter = {})
         routes_to_display = filter_routes(normalize_filter(filter))
-        # puts filter
         columns_to_display = filter_columns(filter) || nil
         routes = collect_routes(routes_to_display)
         if routes.none?
@@ -89,8 +88,6 @@ module ActionDispatch
           elsif filter[:grep]
             { controller: /#{filter[:grep]}/, action: /#{filter[:grep]}/,
               verb: /#{filter[:grep]}/, name: /#{filter[:grep]}/, path: /#{filter[:grep]}/ }
-          elsif filter[:columns]
-            # puts "We are doing some progress"
           end
         end
 
